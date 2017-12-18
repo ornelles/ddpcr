@@ -1,0 +1,9 @@
+Package: ddpcr
+Title: Digital Droplet PCR with QuantaSoft data from BioRad
+Version: 0.0.0.9000
+Authors@R: person("David", "Ornelles", email = "ornelles@wakehealth.edu", role = c("aut", "cre"))
+Description: R functions to manage ddPCR data from BioRad.
+Depends: R (>= 3.2.1), bbmle, cutoff, diptest, lattice, MASS
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
