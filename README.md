@@ -1,45 +1,58 @@
 ## Synopsis
-This is a suite of tools based on the `virustiter` package to analyze BioRad digital PCR data. This code requires the 	`MASS`, `bbmle`, `cutoff`, `diptest`and `lattice` packages.
+
+A suite of tools based on the *still under development* `virustiter` package to analyze BioRad digital PCR data. This code requires the `MASS`, `bbmle`, `cutoff`, `diptest`, `genefilter` and `lattice` packages.
 
 ## Overview
-This is the first attempt to adapt the virus titer code to process two channel ddPCR results. Data exported as CSV files from QuantaSoft are merged with phenotype data to count positives.  
+
+This is a quick attempt to adapt the virus titer code to process two channel ddPCR results. Data exported as CSV files from QuantaSoft are merged with phenotype data to identify positive drops.
+
+The key function implemented here is `findBgnd()` which is the logic behind `getCut()` to determine the cutoff thresholds. If the population shows evidence of being bimodal, code from the package `cutoff` is used to determine the break point. This code allows for different possible distributions (Gaussian, log-normal, Poisson, etc.) for the left and right populations. If the population is negative and symmetric, the population is fit to a Gaussian curve to determine the mean and standard deviation. If the population is asymmetric and mostly negative with some positive samples to the right, the left half of the population is assumed to define the true negative values. This half-population is used to determine the best values for a mean and standard deviation with `genefilter::half.range.mode`. The cutoff is set at a default value of 6 x &sigma; above the mean but this can be changed by the user. 
+
+There is no code for handling outlying or indeterminate values. These can be handled with the usual tools in R. 
 
 ## Installation
 
-**This is NOT meant for installation yet.** If all goes well, the contents can be cloned and "installed" locally from the local directory with `devtools::load_all()`.
+**This is NOT meant for installation as an R package just yet.** If all goes well, the contents can be cloned and "installed" locally from the local `path` with `devtools::load_all(path)`.
 
 ## Working notes
-Phenotype date should be a data frame with the variable `well` as a character string such as "A1" or "A01".
 
-Additional properties as variables in the phenotype data frame will be merged with the raw data. 
+Phenotype data should be a data frame with the variable `well` as a factor such as "A1" or "A01" where the case and zeros used for padding are ignored.
 
-The expected work flow requires loading the data, assigning binary cutoff values (intermediate values are not yet accommodated.) 
+Additional properties can be placed in the phenotype data frame as factor variables. These will be merged with the raw data. 
 
-Typical workflow:
+After ensuring the packages have been installed, a sample work flow is illustrated below. The sample data are from a demo run at Wake Forest University on December 4, 2017.  
+
 ```
-## libraries
-	library(MASS)
-	library(bbmle)
-	library(cutoff)
-	library(diptest)
-	library(lattice)
+## select one CSV files exported from QuantaSoft and load phenotype data
+	fd <- system.file("extdata",
+		"20171204_DEMO_ORNELLES_A01_Amplitude.csv", package = "ddpcr")
+	data(pd)	# load phenotype data frame
 
-  fd <- file.choose() # CSV file
-  fp <- file.choose() # phenodata CSV file (or RDA file)
-  df <- readData(fd)
-  pd <- read.csv(fp)  # or pd <- readRDS(fp)
-  df <- mergeData(pd, df)
-  cut <- getCut(df)
-  df <- score(df, cut)
-# filter df for outliers (excessively high values)
-  res <- tally(df)
+## read data, merge with phenotype data, determine cutoff and score
+	df <- readData(fd) # read values into data frame
+	df <- mergeData(pd, df) # merge with phenotype data
+	cut <- getCut(df, mult = c(5, 8)) # determine cutoff with adjustments
+	df <- score(df, cut) # determine positives and quadrants
+
+## filter outliers
+	df <- subset(df, ch1 < 600)		# HAdV
+	df <- subset(df, ch2 < 2000)	# CMV
+
+## One interesting sample displayed with lattice
+	tp <- trellis.par.get()
+	tp$superpose.symbol <- list(alpha = 0.5, col = c("gray", "#0080ff", "#ff00ff", "darkgreen"),
+		fill = c("gray", "#0080ff", "#ff00ff", "darkgreen"), pch = c(1, 21, 21, 21))
+	obj <- xyplot(ch1 ~ ch2 | sample + well:donor, df, subset = well == "A02", groups = quad)
+	obj <- update(obj, panel = function(...) {panel.grid(h = -1, v = -1); panel.superpose(...)})
+	obj <- update(obj, xlab = "CMV (ch2, HEX) amplitude", ylab = "HAdV (ch1, FAM) amplitude")
+	obj <- update(obj, par.settings = tp)
+	plot(obj)
 ```
-Supporting functions:
+To be migrated supporting functions:
 ```
-  plotCut(df)    # TO DO: calculate and show cutoff values with densityplot 
-  plotHist(df)   # TO DO: histogram of each well with optional cutoff values
-  plotPlate(df)  # TO DO: lattice plot plate showing cell position and positives
-  plotWell(df, well) # TO DO:
+plotCut(df)    # TO DO: show cutoff values with densityplot 
+plotHist(df)   # TO DO: show histogram with cutoff values
+plotPlate(df)  # TO DO: all-at-once 1D plate à la BioRad with lattice
 ```  
 ## License
 GPL-3
