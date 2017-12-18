@@ -11,6 +11,9 @@ plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column")
 		smooth = 1, mult = 5, log = TRUE, main = NULL, as.table = TRUE, layout = NULL,
 		...)
 {
+message("NOT IMPLEMENTED YET")
+return(NULL)
+
 	if (missing(df)) {
 		usage <- c("plotHist examples:",
 			'  plotHist(df)      # calculates and plots default cut values in df',

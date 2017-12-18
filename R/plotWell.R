@@ -7,6 +7,9 @@
 #########################################################################################
 
 plotWell <- function(df, myWell=levels(df$well), cex=1, invert.y=TRUE, ...) {
+message("NOT IMPLEMENTED YET")
+return(NULL)
+
 	if (!"well" %in% names(df))
 		stop("requires variable 'well' in ", deparse(substitute(df)))
 	library(lattice)

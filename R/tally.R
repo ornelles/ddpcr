@@ -10,6 +10,9 @@
 
 tally <- function(df, pd = NULL)
 {
+message("NOT IMPLEMENTED YET")
+return(NULL)
+
 	stopifnot(c("positive", "moi") %in% names(df))
 	if (!any(c("well", "file") %in% names(df)))
 		stop("requires 'well' or 'file' in data")

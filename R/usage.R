@@ -2,6 +2,9 @@
 # usage - display functional information
 #
 usage <- function() {
+message("NOT IMPLEMENTED YET")
+return(NULL)
+
 	txt <- c(
 	" Usage:",
 	"   df <- parseImages()   # read paired images with EBImage ...or...",

@@ -7,6 +7,9 @@
 #########################################################################################
 
 plotPlate <- function(df, cex=1/2, alpha=1/2, main, invert.y=TRUE, ... ) {
+message("NOT IMPLEMENTED YET")
+return(NULL)
+
 	library(lattice)
 
 	if ("well" %in% names(df)) {
