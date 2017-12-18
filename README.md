@@ -23,9 +23,11 @@ Additional properties can be placed in the phenotype data frame as factor variab
 After ensuring the packages have been installed, a sample work flow is illustrated below. The sample data are from a demo run at Wake Forest University on December 4, 2017.  
 
 ```
-## select one CSV files exported from QuantaSoft and load phenotype data
+## select one CSV file within the directory of files exported by QuantaSoft
   fd <- system.file("extdata",
     "20171204_DEMO_ORNELLES_A01_Amplitude.csv", package = "ddpcr")
+
+## load phenotype data, here as a data frame named 'pd'
   data(pd)  # load phenotype data frame
 
 ## read data, merge with phenotype data, determine cutoff and score
