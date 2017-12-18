@@ -4,7 +4,7 @@
 # Calculate the likely cutoff value between a bimodal Gaussian distribution or
 # a cutoff value to the right of an asymmetric normal distribution by Otsu's
 # method for a robust mean and standard deviation. Requires 'cutoff', 'bbmle',
-# 'diptest', 'MASS', and 'genefilter' packages. 
+# 'diptest', and 'MASS' packages. Suggests 'genefilter' package. 
 #
 # Arguments
 #	x		values to evaluate
@@ -23,6 +23,12 @@ findBgnd <- function(x, mult = 6, beta = 0.25, asym = FALSE, log = FALSE)
 {
 # determine background according to bimodal nature
 	bimodal <- suppressMessages(diptest::dip.test(x)$p.value < 0.05)
+
+# allow use without genefilter package
+	if (asym == TRUE && !require(genefilter, quietly = TRUE)) {
+		message("No genefilter package available: ignoring 'asym' option")
+		asym <- FALSE
+	}
 
 # use sample of input if bimodal
 	if (bimodal & length(x) > 3000)
