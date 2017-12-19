@@ -1,12 +1,12 @@
 ## Synopsis
 
-A suite of tools based on the *still under development* `virustiter` package to analyze BioRad digital PCR data. This code requires the `MASS`, `bbmle`, `cutoff`, `diptest`, `genefilter` and `lattice` packages.
+A suite of tools based on the *still under development* `virustiter` package to analyze BioRad digital PCR data. This code requires the `MASS`, `bbmle`, `cutoff`, `diptest` and `lattice` packages and suggests the `genefilter` package. 
 
 ## Overview
 
 This is a quick attempt to adapt the virus titer code to process two channel ddPCR results. Data exported as CSV files from QuantaSoft are merged with phenotype data to identify positive drops.
 
-The key function implemented here is `findBgnd()` which is the logic behind `getCut()` to determine the cutoff thresholds. If the population shows evidence of being bimodal, code from the package `cutoff` is used to determine the break point. This code has the potential to accommodate different distributions (Gaussian, log-normal, Poisson, etc.) for the left and right populations. The code here only uses Gaussian populations. If most of the drops are negative and symmetric, the population is fit to a Gaussian curve to determine the mean and standard deviation. If the population is asymmetric and mostly negative with some positive samples to the right, the left half of the population is assumed to define the true negative values with the option `asym` set to `TRUE`. This half-population is used to determine the best values for a mean and standard deviation with `genefilter::half.range.mode()`. The cutoff is set at a default value of 6 x &sigma; above the mean but this can be changed by the user. 
+The key function implemented here is `findBgnd()` which is the logic behind `getCut()` to determine the cutoff thresholds. If the population shows evidence of being bimodal, code from the package `cutoff` is used to determine the break point. This code has the potential to accommodate distributions in addition to Gaussian such as log-normal, Poisson, Weibull, etc., for the left and right populations. However, this implementation assumes both populations can be described by a Gaussian curve. If most of the drops are negative and the distribution appears symmetrical, the population is fit to a Gaussian curve to determine the mean and standard deviation. If the negative population distribution appears asymmetric and has some positive samples to the right, the left half of the population is used to define the true negative values with the option `asym` set to `TRUE`. This half-population is used to determine the best values for a mean and standard deviation with `genefilter::half.range.mode()`. The cutoff for a unimodal population is set at a default value of 6&sigma; above the mean but the multiplier (6) can be changed by the user. 
 
 There is no code for handling outlying or indeterminate values. These can be handled with the usual tools in R. 
 
@@ -20,10 +20,10 @@ Phenotype data should be a data frame with the variable `well` as a factor such 
 
 Additional properties can be placed in the phenotype data frame as factor variables. These will be merged with the raw data. 
 
-After ensuring the packages have been installed, a sample work flow is illustrated below. The sample data are from a demo run at Wake Forest University on December 4, 2017.  
+After ensuring the packages have been installed, the sample work flow below can be run by copying and pasting the text. The sample data are from a demonstration run at Wake Forest University on December 4, 2017.  
 
 ```
-## select one CSV file within the directory of files exported by QuantaSoft
+## select any CSV file within the directory of files exported by QuantaSoft
   fd <- system.file("extdata",
     "20171204_DEMO_ORNELLES_A01_Amplitude.csv", package = "ddpcr")
 
@@ -40,6 +40,12 @@ After ensuring the packages have been installed, a sample work flow is illustrat
   df <- subset(df, ch1 < 600)   # HAdV probe in FAM
   df <- subset(df, ch2 < 2000)  # CMV probe in HEX
 
+## plot QuantaSoft-style 1-dimension result (with lattice)
+	plot1d(df, column == "1")
+
+## tally results to see total events, total positive and Poisson number
+  tally(df)  # tally(df, pd) merges results with phenotype data
+
 ## One interesting sample displayed with lattice
   tp <- trellis.par.get()
   tp$superpose.symbol <- list(alpha = 0.5, col = c("gray", "#0080ff", "#ff00ff", "darkgreen"),
@@ -52,9 +58,8 @@ After ensuring the packages have been installed, a sample work flow is illustrat
 ```
 Supporting functions to be migrated sometime:
 ```
-plotCut(df)    # TO DO: show cutoff values with densityplot 
-plotHist(df)   # TO DO: show histogram with cutoff values
-plotPlate(df)  # TO DO: all-at-once 1D plate à la BioRad with lattice
+plotCut(df)    # show cutoff values with densityplot 
+plotHist(df)   # show cutoff values with histogram
 ```  
 ## License
 
