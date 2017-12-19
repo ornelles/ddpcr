@@ -1,52 +1,38 @@
-#########################################################################################
+################################################################################
 # tally
 #
-# tally positive and negative values data.frame from readIJResults() by well or file
+# tally total events, positive events, and calculate target number by Poisson
 #
-# returns "result" data.frame with dir, well, moi, pos, neg and y and unit
 # merges additional phenotype data in optional pd
 #
-#########################################################################################
+################################################################################
 
 tally <- function(df, pd = NULL)
 {
-message("NOT IMPLEMENTED YET")
-return(NULL)
+# working with channels (ignoring quadrant for now)
+	vars <- grep("^ch[[:digit:]].pos$", names(df))
+	ch <- sub(".pos", "", names(df)[vars], fixed = TRUE)
+	nchan <- length(vars)
+	if (nchan < 1 | nchan > 2)
+		stop("found ", nchan, " channels, expected 1 or 2")
 
-	stopifnot(c("positive", "moi") %in% names(df))
-	if (!any(c("well", "file") %in% names(df)))
-		stop("requires 'well' or 'file' in data")
+# collect number of events, number of positives and number of targets
+	res <- aggregate(df[vars], df["well"], length)
+	names(res)[-1]  <- paste(ch, "events", sep = ".")
+	val <- aggregate(df[vars], df["well"], sum)
+	res <- cbind(res, val[-1])
+	val <- aggregate(df[vars], df["well"], function(x)
+			round(length(x) * (-log(sum(!x)/length(x)))))
+	names(val)[-1] <- paste(ch, "targets", sep = ".")
+	res <- cbind(res, val[-1])
 
-# select well or file as grouping variable
-	if ("well" %in% names(df))
-		group <- df$well
-	else
-		group <- df$file
+# group data by channel
+	idx <- c(matrix(seq_len(3*nchan), ncol = nchan, byrow = T))
+	res <- cbind(res[1], res[idx+1])
 
-# extract data frame name
-	if (!is.null(df$dir) & nlevels(df$dir)==1)
-		dir <- levels(df$dir)
-	else
-		dir <- "unknown"
-
-# tally positive and create results data.frame
-	pos <- tapply(df$positive==TRUE, group, sum)
-	neg <- tapply(df$positive==FALSE, group, sum)
-	y <- pos/(pos + neg)
-	moi <- sapply(names(pos),function(v) df$moi[group==v][1])
-	unit <- df$unit[1]
-	if ("well" %in% names(df)) {
-		well <- names(pos)
-		row <- well.info(well)$row
-		column <- well.info(well)$column
-		res <- data.frame(dir, well, row, column, moi, unit, pos, neg, y)
-	}
-	else {
-		file <- names(pos)
-		res <- data.frame(dir, file, moi, unit, pos, neg, y)
-	}
+# merge with pd and return
 	if (!is.null(pd))
-		res <- mergePdata(pd, res)
+		res <- mergeData(pd, res)
 	rownames(res) <- NULL
 	return(res)
 }
