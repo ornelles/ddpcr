@@ -8,7 +8,7 @@
 #	df	data frame from readData
 #	by	character vector indicating "well", "row", "column" or "all"
 #		`by` can be the same length as the number of channels.
-#	...	params passed to `find.bgnd` such as `mult`, `beta`, `asym`, and `log`
+#	...	params passed to `find.bgnd` such as `mult`, `beta`, and `asym`
 #		each can be a vector the same length as the number of channels.
 #
 # Value
@@ -20,7 +20,7 @@ getCut <- function(df, by = c("well", "well"), ...)
 {
 	if (missing(df)) {
 		usage <- c("getCut examples:",
-			'  getCut(df, "well", mult = 6, log = FALSE)',
+			'  getCut(df, "well", mult = 6, asym = FALSE)',
 			'  getCut(df) # same as above',
 			'  getCut(df, by = c("well", "column"), mult = c(6, 10))')
 		cat(usage, sep="\n")
