@@ -1,18 +1,26 @@
 ## Synopsis
 
-A suite of tools based on the *still under development* `virustiter` package to analyze BioRad digital PCR data. This code requires the `MASS`, `bbmle`, `cutoff`, `diptest` and `lattice` packages and suggests the `genefilter` package. 
+A suite of tools based on the *still under development* `virustiter` package to analyze BioRad digital PCR data. This requires installing the `cutoff` package by N. T. Choisy from GitHub (as of December 2017). The code to do this is `devtools::install_github("choisy/cutoff"). The `cutoff` package requires several dependencies including one that it fails to automatically load: `bblme`.
+
+In addition to `cutoff`, the `ddpcr` package here requires the `bblme`, `diptest`, `lattice` and `MASS` packages and suggests the `genefilter` package from the BioConductor.  
 
 ## Overview
 
-This is a quick attempt to adapt the virus titer code to process two channel ddPCR results. Data exported as CSV files from QuantaSoft are merged with phenotype data to identify positive drops.
+This is a quick attempt to adapt the virus titer code to process two channel ddPCR results.
 
-The key function implemented here is `findBgnd()` which is the logic behind `getCut()` to determine the cutoff thresholds. If the population shows evidence of being bimodal, code from the package `cutoff` is used to determine the break point. This code has the potential to accommodate distributions in addition to Gaussian such as log-normal, Poisson, Weibull, etc., for the left and right populations. However, this implementation assumes both populations can be described by a Gaussian curve. If most of the drops are negative and the distribution appears symmetrical, the population is fit to a Gaussian curve to determine the mean and standard deviation. If the negative population distribution appears asymmetric and has some positive samples to the right, the left half of the population is used to define the true negative values with the option `asym` set to `TRUE`. This half-population is used to determine the best values for a mean and standard deviation with `genefilter::half.range.mode()`. The cutoff for a unimodal population is set at a default value of 6&sigma; above the mean but the multiplier (6) can be changed by the user. 
+Data must be exported as CSV files from QuantaSoft. After loading the data, select the "Setup" tab, click on the "Options" link on the right panel to reveal the options. The link will change to "Hide Options." Use the "Export Amplitude and Cluster Data" link to export the CSV files to a selected directory.
+
+![QuantaSoft Clip](images/QuantaSoft_clip.png)
+
+The data in this directory will be merged with phenotype data to identify positive drops and make the data accessible as a data frame in R. 
+
+The key function implemented here is `findBgnd()` which is the logic behind `getCut()` to determine the cutoff thresholds. If the population shows evidence of being bimodal, code from the package `cutoff` is used to determine the break point. This code has the potential to accommodate various distributions including Gaussian such as log-normal, Poisson, Weibull, and more for the left and right populations. However, this implementation assumes both populations can be described by a Gaussian curve. If most of the drops are negative and the distribution appears symmetrical, the population is assumed to be Gaussian and the mean and standard deviation are determined directly. If the distribution of the negative population appears asymmetric with positive samples to the right, the option `asym == TRUE` directs to code to use the left half of the population peak to determine the "true" mean and standard deviation of the negative population with `genefilter::half.range.mode()` function. The cutoff for a unimodal population is set at a default value of 6&sigma; above the mean but the multiplier (6) can be changed by the user. 
 
 There is no code for handling outlying or indeterminate values. These can be handled with the usual tools in R. 
 
 ## Installation
 
-**This is NOT meant for installation as an R package just yet.** This repository can be cloned and "installed" locally by setting `path` to the local directory with `devtools::load_all(path)`. (The `devtools` package may have to be installed as well.)
+**This is NOT meant for installation as an R package just yet.** After ensuring that the dependencies mentioned above are available, this repository can be cloned and "installed" locally by setting `path` to the local directory with `devtools::load_all(path)`. (The `devtools` package may have to be installed as well.)
 
 ## Working notes
 
