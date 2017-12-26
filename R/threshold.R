@@ -2,7 +2,7 @@
 # threshold
 # 
 # Calculate the likely threshold between a bimodal Gaussian distribution or
-# a threshold to the right of an asymmetric normal distribution by Otsu's
+# a threshold to the right of a normal or asymmetric distribution by Otsu's
 # method for a robust mean and standard deviation. Requires 'cutoff', 'bbmle',
 # 'diptest', and 'MASS' packages. Suggests 'genefilter' package. 
 #
@@ -13,14 +13,20 @@
 #			default value of 0.25
 #	asym	logical value to use lower half of an asymmetric unimodal distribution
 #			to estimate mean and standard deviation, otherwise use entire population
-#	full	logical value to return a list with mu (mean) and sigma (sd) for 
-#			the peak population(s), bimodal status, and parameter values. If `bimodal`
-#			is `TRUE`, the value returned for `mult` is the "best-fit" value
-#			given by `(thresh - mu1)/sd1` and **not** the original parameter.
+#	full	if TRUE, return a list with `mu` (mean) and `sd` (standard deviation) for 
+#			the peak population, bimodal status, and arguments. If `bimodal` is
+#			`TRUE`, additional values returned include `mu2` and `sd2` to describe the
+#			second population. The value returned for `mult` is adjusted to the value
+#			given by `(thresh - mu1)/sd1` and **is not** the original parameter.
 #
 # Result
 #		upper limit of background values as four significant digits or a list with 
 #		this value named 'thresh' with additional parameters as indicated
+#
+# Example
+#		spl <- split(df$ch1, df$well)
+#		ans <- lapply(spl, threshold, full = TRUE)
+#		do.call(rbind, ans)
 #
 ################################################################################
 

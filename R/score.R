@@ -9,7 +9,8 @@
 #	df		data frame from readIJResults()
 #	bg		background cutoff value(s) as a named list of named values
 #
-# Returns original data frame with 'positive' scored as TRUE or FALSE
+# Returns original data frame with 'positive' scored as TRUE or FALSE and a 
+# quadrant indicator if two channels were present
 #
 ################################################################################
 
@@ -53,7 +54,8 @@ score <- function(df, bg)
 		else if (all(bvars %in% levels(df$column)))
 			df[[pvars[i]]] <- df[[ch[i]]] > bg[[i]][as.character(df$column)]
 		else
-			stop("bg must contain single values or a named vector (file, well, row, or column)")
+			stop("bg must contain a single value for each channel", "\n  or\n",
+					"a named vector correspond to the levels in well, row, or column")
 	}
 
 # add quadrant indicator if two channels are present

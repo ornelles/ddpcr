@@ -8,7 +8,7 @@
 #	df	data frame from readData
 #	by	character vector indicating "well", "row", "column" or "all"
 #		`by` can be the same length as the number of channels.
-#	...	params passed to `threshold` such as `mult`, `beta`, and `asym`
+#	...	parameters passed to `threshold` such as `mult`, `beta`, and `asym`
 #		each can be a vector the same length as the number of channels.
 #
 # Value
