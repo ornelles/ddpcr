@@ -7,14 +7,12 @@ return(NULL)
 
 	txt <- c(
 	" Usage:",
-	"   df <- readData()   # read ddPCR data from CSV files",
-	"",
+	"   df <- readData()     # read ddPCR data from CSV files",
 	"   pd <- data.frame(well = levels(df$well), ...)",
-	"",
 	"   df  <- mergePdata(pd, df)  # merge with phenotype data in 'pd'",
-	"   cut <- getThresh(df)  # determine threshold by well, row, column or all",
-	"   df  <- score(df, cut) # assign positive values from threshold",
-	"   res <- tally(df)      # tally positive drops and assign quadrant",
+	"   th <- getThresh(df)  # determine threshold by well, row, column or all",
+	"   df  <- score(df, th) # assign positive values from threshold",
+	"   res <- tally(df)     # tally positive drops and assign quadrant",
 	"", 
 	" Support:",
 	"   threshold(x)   # determine threshold with option for more details",
