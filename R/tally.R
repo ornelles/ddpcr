@@ -3,13 +3,16 @@
 #
 # tally total events, positive events, and calculate target number by Poisson
 #
-# merges additional phenotype data in optional pd
+# merges additional phenotype data in optional pd, order as per 'by.direction'
 #
 ################################################################################
 
-tally <- function(df, pd = NULL)
+tally <- function(df, pd = NULL, by.direction = c("column", "row"))
 {
-# working with channels (ignoring quadrant for now)
+#	assign direction
+	by.direction <- match.arg(by.direction)
+
+# working only with channels defined as "ch1" and "ch2" (ignoring quadrant)
 	vars <- grep("^ch[[:digit:]].pos$", names(df))
 	ch <- sub(".pos", "", names(df)[vars], fixed = TRUE)
 	nchan <- length(vars)
@@ -33,6 +36,16 @@ tally <- function(df, pd = NULL)
 # merge with pd and return
 	if (!is.null(pd))
 		res <- mergeData(pd, res)
+
+# reorder as per 'by'
+	wi <- well.info(res$well)
+	if (by.direction == "row")
+		ord <- order(wi$row, wi$column)
+	else
+		ord <- order(wi$column, wi$row)
+	res <- res[ord, ]
+
+# remove row names and return
 	rownames(res) <- NULL
 	return(res)
 }
