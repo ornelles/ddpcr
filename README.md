@@ -41,7 +41,7 @@ After ensuring the packages have been installed, the sample work flow below can 
 ## read data, merge with phenotype data, determine cutoff and score
   df <- readData(fd)      # read values into data frame
   df <- mergeData(pd, df) # merge with phenotype data
-  th <- getThresh(df, mult = c(5, 8)) # determine cutoff with adjustments
+  th <- getThresh(df, mult = c(5, 8)) # determine threshold with adjustments
   df <- score(df, th)     # determine positive drops, assign to quadrant
 
 ## filter outliers
@@ -64,13 +64,12 @@ After ensuring the packages have been installed, the sample work flow below can 
   obj <- update(obj, par.settings = tp)
   plot(obj)
 
-## explore threshold logic with `threshold()` and `full = TRUE` option
+## explore threshold logic with threshold() and full = TRUE option
   as.data.frame(thresh(df$ch1[df$well=="C01"], full = TRUE))
 ```
 Supporting functions to be migrated sometime:
 ```
-  plotCut(df)    # show cutoff values with densityplot 
-  plotHist(df)   # show cutoff values with histogram
+  plotThresh(df)  # show threshold values with densityplot 
 ```  
 ## License
 
